@@ -11,6 +11,7 @@ function keepAlive() {
 
 const server = http.createServer(function(req, res) {
   if (req.url === '/ping') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.writeHead(200); res.end('pong'); return;
   }
   var qs = req.url.split('?')[1] || '';
