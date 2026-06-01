@@ -150,11 +150,6 @@ function apiFetch(path) {
   return fetch(PROXY + '/?path=' + encodeURIComponent(path))
     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
 }
-function proxyImg(url) {
-  if (!url) return '';
-  return PROXY + '/?img=' + encodeURIComponent(url);
-}
-
 function getImg(p) {
   var m = p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0];
   if (!m) return '';
@@ -191,7 +186,7 @@ function renderPosts() {
     if (gi === 0) {
       var el = document.createElement('div');
       el.className = 'featured';
-      var hero = img ? '<img src="' + proxyImg(img) + '" alt="" loading="lazy" onerror="this.style.display=&quot;none&quot;">' : '<div style="height:260px;background:#1a1a1a"></div>';
+      var hero = img ? '<img src="' + img + '" alt="" loading="lazy" onerror="this.style.display=&quot;none&quot;">' : '<div style="height:260px;background:#1a1a1a"></div>';
       el.innerHTML = hero + '<div class="feat-overlay">' + (cat ? '<div class="feat-cat">' + cat + '</div>' : '') + '<div class="feat-title">' + title + '</div><div class="feat-date">' + ago(date) + '</div></div>';
       el.onclick = (function(p) { return function() { openArticle(p); }; })(post);
       feed.appendChild(el);
@@ -201,7 +196,7 @@ function renderPosts() {
     } else {
       var el = document.createElement('div');
       el.className = 'card';
-      var thumb = img ? '<img src="' + proxyImg(img) + '" alt="" loading="lazy">' : '<div class="card-noimg">&#128240;</div>';
+      var thumb = img ? '<img src="' + img + '" alt="" loading="lazy">' : '<div class="card-noimg">&#128240;</div>';
       el.innerHTML = thumb + '<div class="card-body">' + (cat ? '<div class="card-cat">' + cat + '</div>' : '') + '<div class="card-title">' + title + '</div><div class="card-date">' + ago(date) + '</div></div>';
       el.onclick = (function(p) { return function() { openArticle(p); }; })(post);
       feed.appendChild(el);
@@ -300,11 +295,6 @@ load('');
   return fetch(PROXY + '/?path=' + encodeURIComponent(path))
     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
 }
-function proxyImg(url) {
-  if (!url) return '';
-  return PROXY + '/?img=' + encodeURIComponent(url);
-}
-
 function getImg(p) {
   var m = p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0];
   if (!m) return '';
@@ -341,7 +331,7 @@ function renderPosts() {
     if (gi === 0) {
       var el = document.createElement('div');
       el.className = 'featured';
-      var hero = img ? '<img src="' + proxyImg(img) + '" alt="" loading="lazy" onerror="this.style.display=&quot;none&quot;">' : '<div style="height:260px;background:#1a1a1a"></div>';
+      var hero = img ? '<img src="' + img + '" alt="" loading="lazy" onerror="this.style.display=&quot;none&quot;">' : '<div style="height:260px;background:#1a1a1a"></div>';
       el.innerHTML = hero + '<div class="feat-overlay">' + (cat ? '<div class="feat-cat">' + cat + '</div>' : '') + '<div class="feat-title">' + title + '</div><div class="feat-date">' + ago(date) + '</div></div>';
       el.onclick = (function(p) { return function() { openArticle(p); }; })(post);
       feed.appendChild(el);
@@ -351,7 +341,7 @@ function renderPosts() {
     } else {
       var el = document.createElement('div');
       el.className = 'card';
-      var thumb = img ? '<img src="' + proxyImg(img) + '" alt="" loading="lazy">' : '<div class="card-noimg">&#128240;</div>';
+      var thumb = img ? '<img src="' + img + '" alt="" loading="lazy">' : '<div class="card-noimg">&#128240;</div>';
       el.innerHTML = thumb + '<div class="card-body">' + (cat ? '<div class="card-cat">' + cat + '</div>' : '') + '<div class="card-title">' + title + '</div><div class="card-date">' + ago(date) + '</div></div>';
       el.onclick = (function(p) { return function() { openArticle(p); }; })(post);
       feed.appendChild(el);
