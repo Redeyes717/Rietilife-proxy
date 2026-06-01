@@ -146,7 +146,7 @@ function ago(ds) {
 
 var allPosts = [], shown = 0, currentCat = '', catIds = {};
 
-function apiFetch(path) {
+function apiFetch(path) {   var url = PROXY + '/?path=' + encodeURIComponent(path);   document.getElementById('feed').innerHTML = '<div class="loader"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><p>Fetch: ' + url.substring(0,80) + '</p></div>';   return fetch(url)     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); } (path) {
   return fetch(PROXY + '/?path=' + encodeURIComponent(path))
     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
 }
