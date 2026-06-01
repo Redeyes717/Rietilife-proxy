@@ -104,19 +104,19 @@ header{background:#0f0f0f;position:sticky;top:0;z-index:100}
   <div class="az-label">&#x1F91D; Aziende Amiche</div>
   <div class="az-strip">
     <div class="az-item" onclick="window.open('https://www.instagram.com/emiliano_grillotti_fotografo','_blank')">
-      <img src="https://www.rietilife.com/wp-content/uploads/2013/08/grillotti.png" onerror="this.style.display=\'none\'"><span>Grillotti</span>
+      <img src="https://www.rietilife.com/wp-content/uploads/2013/08/grillotti.png" onerror="this.style.display='none'"><span>Grillotti</span>
     </div>
     <div class="az-item" onclick="window.open('https://www.facebook.com/pages/Fisiotreat/235688826614326','_blank')">
-      <img src="https://www.rietilife.com/wp-content/uploads/2013/08/fisiotreat.png" onerror="this.style.display=\'none\'"><span>Fisiotreat</span>
+      <img src="https://www.rietilife.com/wp-content/uploads/2013/08/fisiotreat.png" onerror="this.style.display='none'"><span>Fisiotreat</span>
     </div>
     <div class="az-item" onclick="window.open('https://www.rietinature.it/','_blank')">
-      <img src="https://www.rietilife.com/wp-content/uploads/2013/10/8ED4C543-69D6-408C-94C0-4A4040B5024B-e1704277045588-100x100.png" onerror="this.style.display=\'none\'"><span>Rieti Nature</span>
+      <img src="https://www.rietilife.com/wp-content/uploads/2013/10/8ED4C543-69D6-408C-94C0-4A4040B5024B-e1704277045588-100x100.png" onerror="this.style.display='none'"><span>Rieti Nature</span>
     </div>
     <div class="az-item" onclick="window.open('https://www.tecnoadsllazio.com/','_blank')">
-      <img src="https://www.rietilife.com/wp-content/uploads/2021/12/logo-retina-100x20.png" onerror="this.style.display=\'none\'"><span>Tecno ADSL</span>
+      <img src="https://www.rietilife.com/wp-content/uploads/2021/12/logo-retina-100x20.png" onerror="this.style.display='none'"><span>Tecno ADSL</span>
     </div>
     <div class="az-item" onclick="window.open('http://www.ciakvideoproduzioni.com','_blank')">
-      <img src="https://www.rietilife.com/wp-content/uploads/2013/08/ciak.png" onerror="this.style.display=\'none\'"><span>Ciak Video</span>
+      <img src="https://www.rietilife.com/wp-content/uploads/2013/08/ciak.png" onerror="this.style.display='none'"><span>Ciak Video</span>
     </div>
     <div class="az-item" onclick="window.open('http://www.cottorella.net','_blank')">
       <span class="az-name">COTTORELLA</span><span>Antiche Fonti</span>
@@ -186,7 +186,7 @@ function renderPosts() {
     if (gi === 0) {
       var el = document.createElement('div');
       el.className = 'featured';
-      var hero = img ? '<img src="' + img + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '<div style="height:260px;background:#1a1a1a"></div>';
+      var hero = img ? '<img src="' + img + '" alt="" loading="lazy" onerror="this.style.display='none'">' : '<div style="height:260px;background:#1a1a1a"></div>';
       el.innerHTML = hero + '<div class="feat-overlay">' + (cat ? '<div class="feat-cat">' + cat + '</div>' : '') + '<div class="feat-title">' + title + '</div><div class="feat-date">' + ago(date) + '</div></div>';
       el.onclick = (function(p) { return function() { openArticle(p); }; })(post);
       feed.appendChild(el);
@@ -261,7 +261,7 @@ function openArticle(post) {
   var link = post.link || '#';
   var img = getImg(post);
   var cat = getCat(post);
-  var hero = img ? '<img class="reader-hero" src="' + img + '" alt="" onerror="this.style.display=\'none\'">' : '';
+  var hero = img ? '<img class="reader-hero" src="' + img + '" alt="" onerror="this.style.display='none'">' : '';
   readerBody.innerHTML = hero + '<div class="reader-content">' + (cat ? '<div class="reader-cat">' + cat + '</div>' : '') + '<div class="reader-title">' + title + '</div><div class="reader-meta">' + ago(post.date || '') + '</div><div id="rta" style="color:#aaa;font-style:italic;font-size:14px">Caricamento testo&hellip;</div><button class="reader-open-web" id="open-web-btn">&#8599; Apri articolo completo</button></div>';
   document.getElementById('open-web-btn').onclick = function() { window.open(link, '_blank'); };
   apiFetch('/wp/v2/posts/' + post.id + '?_embed').then(function(data) {
@@ -330,7 +330,7 @@ function renderPosts() {
     if (gi === 0) {
       var el = document.createElement('div');
       el.className = 'featured';
-      var hero = img ? '<img src="' + img + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '<div style="height:260px;background:#1a1a1a"></div>';
+      var hero = img ? '<img src="' + img + '" alt="" loading="lazy" onerror="this.style.display='none'">' : '<div style="height:260px;background:#1a1a1a"></div>';
       el.innerHTML = hero + '<div class="feat-overlay">' + (cat ? '<div class="feat-cat">' + cat + '</div>' : '') + '<div class="feat-title">' + title + '</div><div class="feat-date">' + ago(date) + '</div></div>';
       el.onclick = (function(p) { return function() { openArticle(p); }; })(post);
       feed.appendChild(el);
@@ -405,7 +405,7 @@ function openArticle(post) {
   var link = post.link || '#';
   var img = getImg(post);
   var cat = getCat(post);
-  var hero = img ? '<img class="reader-hero" src="' + img + '" alt="" onerror="this.style.display=\'none\'">' : '';
+  var hero = img ? '<img class="reader-hero" src="' + img + '" alt="" onerror="this.style.display='none'">' : '';
   readerBody.innerHTML = hero + '<div class="reader-content">' + (cat ? '<div class="reader-cat">' + cat + '</div>' : '') + '<div class="reader-title">' + title + '</div><div class="reader-meta">' + ago(post.date || '') + '</div><div id="rta" style="color:#aaa;font-style:italic;font-size:14px">Caricamento testo&hellip;</div><button class="reader-open-web" id="open-web-btn">&#8599; Apri articolo completo</button></div>';
   document.getElementById('open-web-btn').onclick = function() { window.open(link, '_blank'); };
   apiFetch('/wp/v2/posts/' + post.id + '?_embed').then(function(data) {
