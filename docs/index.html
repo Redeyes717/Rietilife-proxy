@@ -146,11 +146,154 @@ function ago(ds) {
 
 var allPosts = [], shown = 0, currentCat = '', catIds = {};
 
-function apiFetch(path) {   var url = PROXY + '/?path=' + encodeURIComponent(path);   document.getElementById('feed').innerHTML = '<div class="loader"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><p>Fetch: ' + url.substring(0,80) + '</p></div>';   return fetch(url)     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); } (path) {
+function apiFetch(path) {
   return fetch(PROXY + '/?path=' + encodeURIComponent(path))
     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
 }
+function getImg(p) {
+  var m = p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0];
+  if (!m) return '';
+  var s = m.media_details && m.media_details.sizes;
+  if (s) {
+    if (s.medium_large) return s.medium_large.source_url;
+    if (s.large) return s.large.source_url;
+    if (s.medium) return s.medium.source_url;
+  }
+  return m.source_url || '';
+}
 
+function getCat(p) {
+  var t = p._embedded && p._embedded['wp:term'] && p._embedded['wp:term'][0];
+  if (!t) return '';
+  var skip = ['archivio-fotografico','foto-home','apertura','apertura-1','apertura-2','apertura-3','uncategorized'];
+  for (var i = 0; i < t.length; i++) {
+    if (t[i].taxonomy === 'category' && skip.indexOf(t[i].slug) === -1) return t[i].name;
+  }
+  return '';
+}
+
+function renderPosts() {
+  var feed = document.getElementById('feed');
+  var old = feed.querySelector('.more');
+  if (old) old.remove();
+  var batch = allPosts.slice(shown, shown + PAGE);
+  batch.forEach(function(post, i) {
+    var gi = shown + i;
+    var title = (post.title && post.title.rendered || '').replace(/<[^>]+>/g, '');
+    var img = getImg(post);
+    var cat = getCat(post);
+    var date = post.date || '';
+    if (gi === 0) {
+      var el = document.createElement('div');
+      el.className = 'featured';
+      var hero = img ? '<img src="' + img + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '<div style="height:260px;background:#1a1a1a"></div>';
+      el.innerHTML = hero + '<div class="feat-overlay">' + (cat ? '<div class="feat-cat">' + cat + '</div>' : '') + '<div class="feat-title">' + title + '</div><div class="feat-date">' + ago(date) + '</div></div>';
+      el.onclick = (function(p) { return function() { openArticle(p); }; })(post);
+      feed.appendChild(el);
+      var dv = document.createElement('div');
+      dv.className = 'divider'; dv.textContent = 'Ultime notizie';
+      feed.appendChild(dv);
+    } else {
+      var el = document.createElement('div');
+      el.className = 'card';
+      var thumb = img ? '<img src="' + img + '" alt="" loading="lazy" onerror="this.outerHTML='<div class=card-noimg>&#128240;</div>'">' : '<div class="card-noimg">&#128240;</div>';
+      el.innerHTML = thumb + '<div class="card-body">' + (cat ? '<div class="card-cat">' + cat + '</div>' : '') + '<div class="card-title">' + title + '</div><div class="card-date">' + ago(date) + '</div></div>';
+      el.onclick = (function(p) { return function() { openArticle(p); }; })(post);
+      feed.appendChild(el);
+    }
+  });
+  shown += batch.length;
+  if (shown < allPosts.length) {
+    var m = document.createElement('div');
+    m.className = 'more';
+    m.innerHTML = '<button onclick="loadMore()">Carica altre notizie</button>';
+    feed.appendChild(m);
+  }
+}
+
+function loadMore() {
+  var old = document.getElementById('feed').querySelector('.more');
+  if (old) old.remove();
+  var page = Math.floor(shown / PAGE) + 2;
+  var path = '/wp/v2/posts?per_page=' + PAGE + '&page=' + page + '&_embed&orderby=date&order=desc';
+  if (currentCat && catIds[currentCat]) path += '&categories=' + catIds[currentCat];
+  apiFetch(path).then(function(posts) {
+    if (posts && posts.length) { allPosts = allPosts.concat(posts); renderPosts(); }
+  }).catch(function() {});
+}
+
+function load(cat) {
+  document.getElementById('feed').innerHTML = '<div class="loader"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><p>Caricamento&hellip;</p><p style="font-size:11px;color:#aaa;margin-top:6px">Prima apertura: fino a 30 sec</p></div>';
+  allPosts = []; shown = 0; currentCat = cat;
+  function doLoad() {
+    var path = '/wp/v2/posts?per_page=' + PAGE + '&_embed&orderby=date&order=desc';
+    if (cat && catIds[cat]) path += '&categories=' + catIds[cat];
+    apiFetch(path).then(function(posts) {
+      if (!posts || !posts.length) throw new Error('Nessun articolo');
+      allPosts = posts;
+      document.getElementById('feed').innerHTML = '';
+      renderPosts();
+    }).catch(function(e) {
+      document.getElementById('feed').innerHTML = '<div class="err"><strong>}).catch(function(e) {       document.getElementById('feed').innerHTML = '<div class="err"><strong>Errore: </strong>' + e.name + ': ' + e.message + '<button onclick="load(\'\')">&#8635; Riprova</button></div>'; essione</strong>' + e.message + '<button onclick="load('' + cat + '')">&#8635; Riprova</button></div>';
+    });
+  }
+  if (cat && Object.keys(catIds).length === 0) {
+    apiFetch('/wp/v2/categories?per_page=50&hide_empty=true').then(function(cats) {
+      cats.forEach(function(c) { catIds[c.slug] = c.id; }); doLoad();
+    }).catch(function() { doLoad(); });
+  } else { doLoad(); }
+}
+
+var reader = document.getElementById('reader');
+var readerBody = document.getElementById('reader-body');
+function closeReader() { reader.classList.remove('open'); document.body.style.overflow = ''; }
+document.getElementById('reader-back').onclick = closeReader;
+document.getElementById('reader-logo').onclick = function() { closeReader(); window.scrollTo({top: 0}); };
+document.getElementById('home-logo').onclick = function() { closeReader(); window.scrollTo({top: 0}); };
+window.addEventListener('popstate', function() { if (reader.classList.contains('open')) closeReader(); });
+
+function openArticle(post) {
+  reader.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  history.pushState({reader: true}, '', '');
+  reader.scrollTo(0, 0);
+  var title = (post.title && post.title.rendered || '').replace(/<[^>]+>/g, '');
+  var link = post.link || '#';
+  var img = getImg(post);
+  var cat = getCat(post);
+  var hero = img ? '<img class="reader-hero" src="' + img + '" alt="" onerror="this.style.display=\'none\'">' : '';
+  readerBody.innerHTML = hero + '<div class="reader-content">' + (cat ? '<div class="reader-cat">' + cat + '</div>' : '') + '<div class="reader-title">' + title + '</div><div class="reader-meta">' + ago(post.date || '') + '</div><div id="rta" style="color:#aaa;font-style:italic;font-size:14px">Caricamento testo&hellip;</div><button class="reader-open-web" id="open-web-btn">&#8599; Apri articolo completo</button></div>';
+  document.getElementById('open-web-btn').onclick = function() { window.open(link, '_blank'); };
+  apiFetch('/wp/v2/posts/' + post.id + '?_embed').then(function(data) {
+    var c = (data.content && data.content.rendered) || '';
+    var tmp = document.createElement('div');
+    tmp.innerHTML = c;
+    tmp.querySelectorAll('script,iframe,style,.addtoany_share_save_container,.sharedaddy,.jp-relatedposts,figure.wp-block-embed').forEach(function(el) { el.remove(); });
+    tmp.querySelectorAll('p').forEach(function(p) { if (p.textContent.includes('proviene da')) p.remove(); });
+    tmp.querySelectorAll('img').forEach(function(img) { img.removeAttribute('width'); img.removeAttribute('height'); img.style.maxWidth = '100%'; img.loading = 'lazy'; });
+    var area = document.getElementById('rta');
+    if (area) { area.className = 'reader-text'; area.innerHTML = tmp.innerHTML || '<p>Contenuto non disponibile.</p>'; }
+  }).catch(function() {
+    var area = document.getElementById('rta');
+    if (area) area.textContent = 'Errore nel caricamento.';
+  });
+}
+
+document.querySelectorAll('.cat').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.cat').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    load(btn.dataset.cat);
+  });
+});
+
+load('');
+</script>
+</body>
+</html>function apiFetch(path) {
+  return fetch(PROXY + '/?path=' + encodeURIComponent(path))
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+}
 function getImg(p) {
   var m = p._embedded && p._embedded['wp:featuredmedia'] && p._embedded['wp:featuredmedia'][0];
   if (!m) return '';
