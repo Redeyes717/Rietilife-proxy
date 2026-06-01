@@ -235,7 +235,7 @@ function load(cat) {
       document.getElementById('feed').innerHTML = '';
       renderPosts();
     }).catch(function(e) {
-      document.getElementById('feed').innerHTML = '<div class="err"><strong>Errore connessione</strong>' + e.message + '<button onclick="load('' + cat + '')">&#8635; Riprova</button></div>';
+      document.getElementById('feed').innerHTML = '<div class="err"><strong>}).catch(function(e) {       document.getElementById('feed').innerHTML = '<div class="err"><strong>Errore: </strong>' + e.name + ': ' + e.message + '<button onclick="load(\'\')">&#8635; Riprova</button></div>'; essione</strong>' + e.message + '<button onclick="load('' + cat + '')">&#8635; Riprova</button></div>';
     });
   }
   if (cat && Object.keys(catIds).length === 0) {
