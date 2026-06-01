@@ -267,7 +267,7 @@ function load(cat) {
       .catch(function(e) {
         document.getElementById('feed').innerHTML=
           '<div class="err"><strong>Connessione non riuscita</strong>'+e.message+
-          '<button onclick="load(''+cat+'')">&#8635; Riprova</button></div>';
+          '<button onclick="load(\'' + cat + '\')">&#8635; Riprova</button></div>';
       });
   }
 
@@ -303,13 +303,13 @@ function openArticle(post) {
   var cat=getCat(post);
 
   readerBody.innerHTML=
-    (img?'<img class="reader-hero" src="'+img+'" alt="" onerror="this.style.display='none'">' : '')+
+    (img?'<img class="reader-hero" src="'+img+'" alt="" onerror="this.style.display=\'none\'">' : '')+
     '<div class="reader-content">'+
       (cat?'<div class="reader-cat">'+cat+'</div>':'')+
       '<div class="reader-title">'+title+'</div>'+
       '<div class="reader-meta">'+ago(post.date||'')+'</div>'+
       '<div id="rta" style="color:#aaa;font-style:italic;font-size:14px">Caricamento testo&hellip;</div>'+
-      '<button class="reader-open-web" onclick="window.open(''+link+'','_blank')">&#8599; Apri articolo completo</button>'+
+      '<button class="reader-open-web" onclick="window.open(\'' + link + '\',\'_blank\')">&#8599; Apri articolo completo</button>'+
     '</div>';
 
   apiFetch('/wp/v2/posts/'+post.id+'?_embed')
