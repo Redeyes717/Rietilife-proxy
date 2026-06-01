@@ -10,23 +10,37 @@ function keepAlive() {
 }
 
 const server = http.createServer(function(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+
   if (req.url === '/ping') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
     res.writeHead(200); res.end('pong'); return;
   }
+
   var qs = req.url.split('?')[1] || '';
   var params = new URLSearchParams(qs);
-  var path = params.get('path') || '/wp/v2/posts?per_page=12&_embed&orderby=date&order=desc';
-  var target = 'https://www.rietilife.com/wp-json' + path;
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Content-Type', 'application/json');
+  var path = params.get('path') || '';
+  var imgurl = params.get('img') || '';
+
+  var target;
+  if (imgurl) {
+    target = decodeURIComponent(imgurl);
+  } else {
+    target = 'https://www.rietilife.com/wp-json' + path;
+  }
+
   https.get(target, {
-    headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' },
+    headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': '*/*' },
     timeout: 25000
   }, function(r) {
-    var data = '';
-    r.on('data', function(chunk) { data += chunk; });
-    r.on('end', function() { res.writeHead(r.statusCode); res.end(data); });
+    var chunks = [];
+    r.on('data', function(chunk) { chunks.push(chunk); });
+    r.on('end', function() {
+      var ct = r.headers['content-type'] || 'application/json';
+      res.setHeader('Content-Type', ct);
+      res.writeHead(r.statusCode);
+      res.end(Buffer.concat(chunks));
+    });
   }).on('error', function(e) {
     res.writeHead(500); res.end(JSON.stringify({ error: e.message }));
   });
