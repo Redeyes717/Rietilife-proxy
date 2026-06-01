@@ -234,7 +234,8 @@ function load(cat) {
       document.getElementById('feed').innerHTML = '';
       renderPosts();
     }).catch(function(e) {
-      document.getElementById('feed').innerHTML = '<div class="err"><strong>}).catch(function(e) {       document.getElementById('feed').innerHTML = '<div class="err"><strong>Errore: </strong>' + e.name + ': ' + e.message + '<button onclick="load(\'\')">&#8635; Riprova</button></div>'; essione</strong>' + e.message + '<button onclick="load('' + cat + '')">&#8635; Riprova</button></div>';
+    }).catch(function(e) {
+      document.getElementById('feed').innerHTML = '<div class="err"><strong>Errore:</strong> ' + e.message + '<button onclick="load(\'\')" style="display:block;margin:12px auto 0;background:#C8102E;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-family:inherit">&#8635; Riprova</button></div>';
     });
   }
   if (cat && Object.keys(catIds).length === 0) {
