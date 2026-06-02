@@ -17,37 +17,34 @@ const server = http.createServer(function(req, res) {
     res.writeHead(200); res.end('pong'); return;
   }
 
-  var qs = req.url.split('?')[1] || '';
+  var qs = (req.url.split('?')[1] || '');
   var params = new URLSearchParams(qs);
   var path = params.get('path') || '';
-  var imgurl = params.get('img') || '';
+  var img  = params.get('img')  || '';
 
-  var target;
-  if (imgurl) {
-    target = decodeURIComponent(imgurl);
-  } else {
-    target = 'https://www.rietilife.com/wp-json' + path;
-  }
+  var target = img
+    ? decodeURIComponent(img)
+    : 'https://www.rietilife.com/wp-json' + path;
 
   https.get(target, {
     headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': '*/*' },
     timeout: 25000
   }, function(r) {
     var chunks = [];
-    r.on('data', function(chunk) { chunks.push(chunk); });
+    r.on('data', function(c) { chunks.push(c); });
     r.on('end', function() {
-      var ct = r.headers['content-type'] || 'application/json';
-      res.setHeader('Content-Type', ct);
+      res.setHeader('Content-Type', r.headers['content-type'] || 'application/octet-stream');
       res.writeHead(r.statusCode);
       res.end(Buffer.concat(chunks));
     });
   }).on('error', function(e) {
-    res.writeHead(500); res.end(JSON.stringify({ error: e.message }));
+    res.writeHead(500);
+    res.end(JSON.stringify({ error: e.message }));
   });
 });
 
 var PORT = process.env.PORT || 3000;
 server.listen(PORT, function() {
-  console.log('Proxy running on port ' + PORT);
+  console.log('Proxy on port ' + PORT);
   keepAlive();
 });
