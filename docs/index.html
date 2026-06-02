@@ -261,7 +261,8 @@ function load(cat) {
       document.getElementById('feed').innerHTML = '';
       renderPosts();
     }).catch(function(e) {
-      document.getElementById('feed').innerHTML = '<div class="err"><h3>Errore</h3><p>' + e.message + '</p><p><button onclick="load('')"  style="background:#C8102E;color:#fff;border:none;padding:10px 24px;cursor:pointer;font-size:13px;border-radius:4px;margin-top:12px">&#8635; Riprova</button></p></div>';
+    }).catch(function(e) {
+      document.getElementById('feed').innerHTML = '<div class="err"><h3>Errore</h3><p>' + e.message + '</p><p><button onclick="load(&quot;&quot;)" style="background:#C8102E;color:#fff;border:none;padding:10px 24px;cursor:pointer;font-size:13px;border-radius:4px;margin-top:12px">&#8635; Riprova</button></p></div>';
     });
   }
   if (cat && Object.keys(catIds).length === 0) {
