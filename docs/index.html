@@ -152,6 +152,11 @@ function ago(ds) {
 
 var allPosts = [], shown = 0, currentCat = '', catIds = {};
 
+function proxyImg(url) {
+  if (!url) return '';
+  return PROXY + '/?img=' + encodeURIComponent(url);
+}
+
 function apiFetch(path) {
   return fetch(PROXY + '/?path=' + encodeURIComponent(path))
     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
@@ -195,7 +200,7 @@ function renderPosts() {
       el.className = 'featured';
       var inner = '';
       if (img) {
-        inner += '<img src="' + img + '" alt="" loading="lazy">';
+        inner += '<img src="' + proxyImg(img) + '" alt="" loading="lazy">';
       } else {
         inner += '<div style="height:260px;background:#1a1a1a"></div>';
       }
@@ -215,7 +220,7 @@ function renderPosts() {
       el.className = 'card';
       var inner2 = '';
       if (img) {
-        inner2 += '<img src="' + img + '" alt="" loading="lazy">';
+        inner2 += '<img src="' + proxyImg(img) + '" alt="" loading="lazy">';
       } else {
         inner2 += '<div class="card-noimg">&#128240;</div>';
       }
@@ -291,7 +296,7 @@ function openArticle(post) {
   var img = getImg(post);
   var cat = getCat(post);
   var html = '';
-  if (img) html += '<img class="reader-hero" src="' + img + '" alt="">';
+  if (img) html += '<img class="reader-hero" src="' + proxyImg(img) + '" alt="">';
   html += '<div class="reader-content">';
   if (cat) html += '<div class="reader-cat">' + cat + '</div>';
   html += '<div class="reader-title">' + title + '</div>';
