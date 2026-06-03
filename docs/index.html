@@ -110,19 +110,19 @@ header{background:#0f0f0f;position:sticky;top:0;z-index:100;box-shadow:0 2px 16p
   <div class="az-label">&#x1F91D; Aziende Amiche</div>
   <div class="az-strip" id="az-strip">
     <div class="az-item" onclick="window.open('https://www.instagram.com/emiliano_grillotti_fotografo','_blank')">
-      <img src="" data-src="https://www.rietilife.com/wp-content/uploads/2013/08/grillotti.png" alt=""><span>Grillotti</span>
+      <img src="" data-src="https://www.rietilife.com/wp-content/uploads/2013/08/grillotti.png" data-name="GRILLOTTI" alt="Grillotti"><span>Grillotti</span>
     </div>
     <div class="az-item" onclick="window.open('https://www.facebook.com/pages/Fisiotreat/235688826614326','_blank')">
-      <span class="az-name">FISIO</span><span>Treat</span>
+      <img src="" data-src="https://www.rietilife.com/wp-content/uploads/2013/08/fisiotreat.png" data-name="FISIOTREAT" alt="Fisiotreat"><span>Fisiotreat</span>
     </div>
     <div class="az-item" onclick="window.open('https://www.rietinature.it/','_blank')">
-      <img src="" data-src="https://www.rietilife.com/wp-content/uploads/2013/10/8ED4C543-69D6-408C-94C0-4A4040B5024B-e1704277045588-100x100.png" alt=""><span>Rieti Nature</span>
+      <img src="" data-src="https://www.rietilife.com/wp-content/uploads/2013/10/8ED4C543-69D6-408C-94C0-4A4040B5024B-e1704277045588-100x100.png" data-name="RIETI NATURE" alt="Rieti Nature"><span>Rieti Nature</span>
     </div>
     <div class="az-item" onclick="window.open('https://www.tecnoadsllazio.com/','_blank')">
-      <img src="" data-src="https://www.rietilife.com/wp-content/uploads/2021/12/logo-retina-100x20.png" alt=""><span>Tecno ADSL</span>
+      <img src="" data-src="https://www.rietilife.com/wp-content/uploads/2021/12/logo-retina-100x20.png" data-name="TECNO ADSL" alt="Tecno ADSL"><span>Tecno ADSL</span>
     </div>
     <div class="az-item" onclick="window.open('http://www.ciakvideoproduzioni.com','_blank')">
-      <span class="az-name">CIAK</span><span>Video</span>
+      <img src="" data-src="https://www.rietilife.com/wp-content/uploads/2013/08/ciak.png" data-name="CIAK" alt="Ciak Video"><span>Ciak Video</span>
     </div>
     <div class="az-item" onclick="window.open('http://www.cottorella.net','_blank')">
       <span class="az-name">COTTORELLA</span><span>Antiche Fonti</span>
@@ -329,11 +329,20 @@ document.querySelectorAll('.cat').forEach(function(btn) {
 
 load('');
 
-// Proxa i logo delle aziende amiche
+// Proxa i logo delle aziende amiche con fallback testo automatico
 window.addEventListener('load', function() {
   document.querySelectorAll('.az-strip img[data-src]').forEach(function(img) {
     var src = img.getAttribute('data-src');
-    if (src) img.setAttribute('src', proxyImg(src));
+    var name = img.getAttribute('data-name') || '';
+    if (src) {
+      img.setAttribute('src', proxyImg(src));
+      img.onerror = function() {
+        var span = document.createElement('span');
+        span.className = 'az-name';
+        span.textContent = name;
+        this.parentNode.replaceChild(span, this);
+      };
+    }
   });
 });
 </script>
