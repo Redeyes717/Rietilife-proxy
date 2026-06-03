@@ -35,26 +35,20 @@ function scrapeVideos(res) {
     r.on('end', function() {
       var videos = [];
       var seen = {};
-      var linkRe = /href="(https:\/\/www\.rietilife\.com\/video\/[^"]+)"/g;
-      var imgRe = /href="(https:\/\/www\.rietilife\.com\/video\/[^"]+)"[^>]*>\s*<img[^>]+src="([^"]+)"/g;
-      var titleRe = /<h3[^>]*>\s*<a href="(https:\/\/www\.rietilife\.com\/video\/[^"]+)"[^>]*>([^<]+)<\/a>/g;
-      var imgs = {}, titles = {};
-      var m;
-      while ((m = imgRe.exec(data)) !== null) imgs[m[1]] = m[2];
-      while ((m = titleRe.exec(data)) !== null) titles[m[1]] = m[2].trim();
-      while ((m = linkRe.exec(data)) !== null) {
-        var link = m[1];
-        if (seen[link]) continue;
+      // Trova tutti i link /video/
+      var links = data.match(/https?:\/\/www\.rietilife\.com\/video\/[a-z0-9\-]+\//g) || [];
+      links.forEach(function(link) {
+        if (seen[link]) return;
         seen[link] = true;
-        if (titles[link]) {
-          videos.push({
-            link: link,
-            thumb: (imgs[link] || '').replace(/-300x200\./, '-655x437.'),
-            title: titles[link],
-            date: ''
-          });
-        }
-      }
+        // Cerca il titolo vicino al link
+        var idx = data.indexOf(link);
+        var nearby = data.substring(idx, idx + 500);
+        var titleMatch = nearby.match(/<h3[^>]*>[^<]*<a[^>]*>([^<]+)<\/a>/);
+        var imgMatch = data.substring(Math.max(0, idx - 300), idx + 300).match(/src="(https:\/\/www\.rietilife\.com\/wp-content\/uploads\/[^"]+\.(?:jpg|jpeg|png))"/);
+        var title = titleMatch ? titleMatch[1].trim() : link.split('/').slice(-2,-1)[0].replace(/-/g,' ');
+        var thumb = imgMatch ? imgMatch[1].replace(/-300x200\./, '-655x437.') : '';
+        videos.push({ link: link, thumb: thumb, title: title, date: '' });
+      });
       res.setHeader('Content-Type', 'application/json');
       res.writeHead(200);
       res.end(JSON.stringify(videos));
