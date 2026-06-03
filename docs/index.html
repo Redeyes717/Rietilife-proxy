@@ -439,22 +439,7 @@ function loadVideos() {
 
 function openVideo(encLink, encTitle) {
   var link = decodeURIComponent(encLink);
-  var title = decodeURIComponent(encTitle);
-  voverlay.classList.add('open');
-  document.getElementById('vtitle2').textContent = title;
-  document.getElementById('vplayer').innerHTML = '<p style="color:#888;padding:20px">Caricamento&hellip;</p>';
-  fetch(PROXY + '/?video=' + encodeURIComponent(link))
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      if (d.youtubeId) {
-        document.getElementById('vplayer').innerHTML = '<iframe class="vframe" src="https://www.youtube.com/embed/' + d.youtubeId + '?autoplay=1" frameborder="0" allowfullscreen allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>';
-      } else {
-        document.getElementById('vplayer').innerHTML = '<p style="color:#888;padding:20px;text-align:center">Video non disponibile.<br><a href="' + link + '" target="_blank" style="color:#C8102E">Apri sul sito</a></p>';
-      }
-    })
-    .catch(function() {
-      document.getElementById('vplayer').innerHTML = '<p style="color:#888;padding:20px;text-align:center">Errore.<br><a href="' + link + '" target="_blank" style="color:#C8102E">Apri sul sito</a></p>';
-    });
+  window.open(link, '_blank');
 }
 
 load('');
