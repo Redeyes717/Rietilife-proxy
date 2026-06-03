@@ -411,7 +411,7 @@ function loadVideos() {
       }
       var html = '<div class="vsec">Ultimi Video</div>';
       videos.forEach(function(v) {
-        html += '<div class="vcard" onclick="window.open(\'' + encodeURIComponent(v.link) + '\', \'_blank\')">';
+        html += '<div class="vcard" onclick="window.open(\'' + v.link + '\', \'_blank\')">';
         html += '<div class="vthumb">';
         if (v.thumb) html += '<img src="' + proxyImg(v.thumb) + '" alt="" loading="lazy">';
         html += '<div class="vplay"></div></div>';
