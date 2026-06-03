@@ -402,42 +402,31 @@ document.getElementById('vclose').addEventListener('click', function() {
 
 function loadVideos() {
   var grid = document.getElementById('vgrid');
-  apiFetch('/wp/v2/video?per_page=30&_embed&orderby=date&order=desc')
-    .then(function(posts) { renderVideos(posts, grid); })
+  fetch(PROXY + '/?vlist=1')
+    .then(function(r) { return r.json(); })
+    .then(function(videos) {
+      if (!videos || !videos.length) {
+        grid.innerHTML = '<p style="color:#555;padding:20px;text-align:center">Nessun video.</p>';
+        return;
+      }
+      var html = '<div class="vsec">Ultimi Video</div>';
+      videos.forEach(function(v) {
+        html += '<div class="vcard" onclick="openVideo(\'' + encodeURIComponent(v.link) + '\',\'' + encodeURIComponent(v.title) + '\')">';
+        html += '<div class="vthumb">';
+        if (v.thumb) html += '<img src="' + proxyImg(v.thumb) + '" alt="" loading="lazy">';
+        html += '<div class="vplay"></div></div>';
+        html += '<div class="vinfo"><div class="vtitle">' + v.title + '</div>';
+        if (v.date) html += '<div class="vdate">' + v.date + '</div>';
+        html += '</div></div>';
+      });
+      grid.innerHTML = html;
+    })
     .catch(function() {
-      apiFetch('/wp/v2/posts?per_page=30&_embed&search=rietilife+tv&orderby=date&order=desc')
-        .then(function(posts) { renderVideos(posts, grid); })
-        .catch(function() {
-          grid.innerHTML = '<p style="color:#555;padding:20px;text-align:center">Video non disponibili.</p>';
-        });
+      grid.innerHTML = '<p style="color:#555;padding:20px;text-align:center">Video non disponibili.</p>';
     });
 }
 
-function renderVideos(posts, grid) {
-  if (!posts || !posts.length) {
-    grid.innerHTML = '<p style="color:#555;padding:20px;text-align:center">Nessun video.</p>';
-    return;
-  }
-  var html = '<div class="vsec">Ultimi Video</div>';
-  posts.forEach(function(post) {
-    var title = (post.title && post.title.rendered || '').replace(/<[^>]+>/g, '');
-    var link = post.link || '#';
-    var thumb = getImg(post);
-    var cat = getCat(post);
-    var date = post.date || '';
-    var el = '<div class="vcard" onclick="openVideo(' + "'" + encodeURIComponent(link) + "','" + encodeURIComponent(title) + "'" + ')">';
-    el += '<div class="vthumb">';
-    if (thumb) el += '<img src="' + proxyImg(thumb) + '" alt="" loading="lazy">';
-    el += '<div class="vplay"></div></div>';
-    el += '<div class="vinfo">';
-    if (cat) el += '<div class="vcat">' + cat + '</div>';
-    el += '<div class="vtitle">' + title + '</div>';
-    el += '<div class="vdate">' + ago(date) + '</div>';
-    el += '</div></div>';
-    html += el;
-  });
-  grid.innerHTML = html;
-}
+
 
 function openVideo(encLink, encTitle) {
   var link = decodeURIComponent(encLink);
