@@ -106,7 +106,7 @@ header{background:#0f0f0f;position:sticky;top:0;z-index:100;box-shadow:0 2px 16p
     <p style="font-size:11px;color:#aaa;margin-top:6px">Prima apertura: fino a 30 sec</p>
   </div>
 </div>
-<div class="az-footer">
+<div class="az-footer" id="az-footer">
   <div class="az-label">&#x1F91D; Aziende Amiche</div>
   <div class="az-strip">
     <div class="az-item" onclick="window.open('https://www.instagram.com/emiliano_grillotti_fotografo','_blank')">
@@ -328,6 +328,14 @@ document.querySelectorAll('.cat').forEach(function(btn) {
 });
 
 load('');
+
+// Proxa le immagini del footer
+window.addEventListener('load', function() {
+  document.querySelectorAll('.az-strip img').forEach(function(img) {
+    var src = img.getAttribute('src');
+    if (src) img.setAttribute('src', proxyImg(src));
+  });
+});
 </script>
 </body>
 </html>
