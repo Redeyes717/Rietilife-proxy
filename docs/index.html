@@ -439,7 +439,10 @@ function loadVideos() {
 
 function openVideo(encLink, encTitle) {
   var link = decodeURIComponent(encLink);
-  window.open(link, '_blank');
+  var title = decodeURIComponent(encTitle);
+  voverlay.classList.add('open');
+  document.getElementById('vtitle2').textContent = title;
+  document.getElementById('vplayer').innerHTML = '<iframe src="' + link + '" style="width:100%;max-width:480px;height:70vh;border:none;display:block;" allowfullscreen></iframe>';
 }
 
 load('');
