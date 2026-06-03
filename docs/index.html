@@ -402,33 +402,24 @@ document.getElementById('vclose').addEventListener('click', function() {
 
 function loadVideos() {
   var grid = document.getElementById('vgrid');
-  apiFetch('/wp/v2/posts?per_page=50&_embed&orderby=date&order=desc&search=RIETILIFE+TV')
-    .then(function(posts) {
-      if (!posts || !posts.length) {
+  fetch(PROXY + '/?vlist=1')
+    .then(function(r) { return r.json(); })
+    .then(function(videos) {
+      if (!videos || !videos.length) {
         grid.innerHTML = '<p style="color:#555;padding:20px;text-align:center">Nessun video.</p>';
         return;
       }
       var html = '<div class="vsec">Ultimi Video</div>';
-      var count = 0;
-      posts.forEach(function(post) {
-        var title = (post.title && post.title.rendered || '').replace(/<[^>]+>/g, '');
-        if (title.toUpperCase().indexOf('RIETILIFE TV') === -1) return;
-        var link = post.link;
-        var thumb = getImg(post);
-        var cat = getCat(post);
-        var date = post.date || '';
-        html += '<div class="vcard" onclick="openVideo(\'' + encodeURIComponent(link) + '\',\'' + encodeURIComponent(title) + '\')">';
+      videos.forEach(function(v) {
+        html += '<div class="vcard" onclick="window.open(\'' + encodeURIComponent(v.link) + '\', \'_blank\')">';
         html += '<div class="vthumb">';
-        if (thumb) html += '<img src="' + proxyImg(thumb) + '" alt="" loading="lazy">';
+        if (v.thumb) html += '<img src="' + proxyImg(v.thumb) + '" alt="" loading="lazy">';
         html += '<div class="vplay"></div></div>';
-        html += '<div class="vinfo">';
-        if (cat) html += '<div class="vcat">' + cat + '</div>';
-        html += '<div class="vtitle">' + title + '</div>';
-        html += '<div class="vdate">' + ago(date) + '</div>';
+        html += '<div class="vinfo"><div class="vtitle">' + v.title + '</div>';
+        if (v.date) html += '<div class="vdate">' + v.date + '</div>';
         html += '</div></div>';
-        count++;
       });
-      grid.innerHTML = count ? html : '<p style="color:#555;padding:20px;text-align:center">Nessun video.</p>';
+      grid.innerHTML = html;
     })
     .catch(function() {
       grid.innerHTML = '<p style="color:#555;padding:20px;text-align:center">Video non disponibili.</p>';
