@@ -402,25 +402,17 @@ document.getElementById('vclose').addEventListener('click', function() {
 
 function loadVideos() {
   var grid = document.getElementById('vgrid');
-  apiFetch('/wp/v2/posts?per_page=30&_embed&orderby=date&order=desc&categories=41344,41345,41335')
-    .then(function(posts) {
-      // Filtra solo i post con URL /video/
-      var videos = posts.filter(function(p) { return p.link && p.link.indexOf('/video/') !== -1; });
-      if (!videos.length) {
-        // Fallback: cerca per slug
-        return apiFetch('/wp/v2/posts?per_page=50&_embed&orderby=date&order=desc&search=rietilife+tv');
-      }
-      return videos;
-    })
+  apiFetch('/wp/v2/posts?per_page=50&_embed&orderby=date&order=desc&search=RIETILIFE+TV')
     .then(function(posts) {
       if (!posts || !posts.length) {
         grid.innerHTML = '<p style="color:#555;padding:20px;text-align:center">Nessun video.</p>';
         return;
       }
       var html = '<div class="vsec">Ultimi Video</div>';
+      var count = 0;
       posts.forEach(function(post) {
-        if (!post.link || post.link.indexOf('/video/') === -1) return;
         var title = (post.title && post.title.rendered || '').replace(/<[^>]+>/g, '');
+        if (title.toUpperCase().indexOf('RIETILIFE TV') === -1) return;
         var link = post.link;
         var thumb = getImg(post);
         var cat = getCat(post);
@@ -434,8 +426,9 @@ function loadVideos() {
         html += '<div class="vtitle">' + title + '</div>';
         html += '<div class="vdate">' + ago(date) + '</div>';
         html += '</div></div>';
+        count++;
       });
-      grid.innerHTML = html || '<p style="color:#555;padding:20px;text-align:center">Nessun video.</p>';
+      grid.innerHTML = count ? html : '<p style="color:#555;padding:20px;text-align:center">Nessun video.</p>';
     })
     .catch(function() {
       grid.innerHTML = '<p style="color:#555;padding:20px;text-align:center">Video non disponibili.</p>';
