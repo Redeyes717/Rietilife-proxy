@@ -235,12 +235,10 @@ function renderPosts() {
     }
   });
   shown += batch.length;
-  if (shown < allPosts.length) {
-    var m = document.createElement('div');
-    m.className = 'more';
-    m.innerHTML = '<button onclick="loadMore()">Carica altre notizie</button>';
-    feed.appendChild(m);
-  }
+  var m = document.createElement('div');
+  m.className = 'more';
+  m.innerHTML = '<button onclick="loadMore()">Carica altre notizie</button>';
+  feed.appendChild(m);
 }
 
 function loadMore() {
