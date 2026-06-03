@@ -334,15 +334,13 @@ window.addEventListener('load', function() {
   document.querySelectorAll('.az-strip img[data-src]').forEach(function(img) {
     var src = img.getAttribute('data-src');
     var name = img.getAttribute('data-name') || '';
-    if (src) {
-      img.setAttribute('src', proxyImg(src));
-      img.onerror = function() {
-        var span = document.createElement('span');
-        span.className = 'az-name';
-        span.textContent = name;
-        this.parentNode.replaceChild(span, this);
-      };
-    }
+    img.onerror = function() {
+      var span = document.createElement('span');
+      span.className = 'az-name';
+      span.textContent = name;
+      if (this.parentNode) this.parentNode.replaceChild(span, this);
+    };
+    if (src) img.setAttribute('src', proxyImg(src));
   });
 });
 </script>
