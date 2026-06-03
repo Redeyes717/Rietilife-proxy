@@ -108,28 +108,8 @@ header{background:#0f0f0f;position:sticky;top:0;z-index:100;box-shadow:0 2px 16p
 </div>
 <div class="az-footer" id="az-footer">
   <div class="az-label">&#x1F91D; Aziende Amiche</div>
-  <div class="az-strip">
-    <div class="az-item" onclick="window.open('https://www.instagram.com/emiliano_grillotti_fotografo','_blank')">
-      <img src="https://www.rietilife.com/wp-content/uploads/2013/08/grillotti.png" alt=""><span>Grillotti</span>
-    </div>
-    <div class="az-item" onclick="window.open('https://www.facebook.com/pages/Fisiotreat/235688826614326','_blank')">
-      <img src="https://www.rietilife.com/wp-content/uploads/2013/08/fisiotreat.png" alt=""><span>Fisiotreat</span>
-    </div>
-    <div class="az-item" onclick="window.open('https://www.rietinature.it/','_blank')">
-      <img src="https://www.rietilife.com/wp-content/uploads/2013/10/8ED4C543-69D6-408C-94C0-4A4040B5024B-e1704277045588-100x100.png" alt=""><span>Rieti Nature</span>
-    </div>
-    <div class="az-item" onclick="window.open('https://www.tecnoadsllazio.com/','_blank')">
-      <img src="https://www.rietilife.com/wp-content/uploads/2021/12/logo-retina-100x20.png" alt=""><span>Tecno ADSL</span>
-    </div>
-    <div class="az-item" onclick="window.open('http://www.ciakvideoproduzioni.com','_blank')">
-      <img src="https://www.rietilife.com/wp-content/uploads/2013/08/ciak.png" alt=""><span>Ciak Video</span>
-    </div>
-    <div class="az-item" onclick="window.open('http://www.cottorella.net','_blank')">
-      <span class="az-name">COTTORELLA</span><span>Antiche Fonti</span>
-    </div>
-    <div class="az-item"><span class="az-name">TOSTI</span><span>Abbigliamento</span></div>
-    <div class="az-item"><span class="az-name">TOGO</span><span>Palace Hotel</span></div>
-    <div class="az-item"><span class="az-name">IBL</span><span>Partners</span></div>
+  <div class="az-strip" id="az-strip">
+    <div class="az-item" style="opacity:.4"><span style="font-size:8px;color:#555">Caricamento...</span></div>
   </div>
 </div>
 <script>
@@ -329,12 +309,36 @@ document.querySelectorAll('.cat').forEach(function(btn) {
 
 load('');
 
-// Proxa le immagini del footer
+// Carica aziende amiche dinamicamente
+function loadAziende() {
+  apiFetch('/wp/v2/posts?categories=24733&per_page=20&_embed&orderby=title&order=asc')
+    .then(function(posts) {
+      var strip = document.getElementById('az-strip');
+      if (!strip || !posts || !posts.length) return;
+      strip.innerHTML = '';
+      posts.forEach(function(post) {
+        var title = (post.title && post.title.rendered || '').replace(/<[^>]+>/g,'');
+        var link = post.link || '#';
+        var img = getImg(post);
+        var el = document.createElement('div');
+        el.className = 'az-item';
+        el.onclick = function() { window.open(link, '_blank'); };
+        var inner = '';
+        if (img) {
+          inner += '<img src="' + proxyImg(img) + '" alt="' + title + '">';
+        } else {
+          inner += '<span class="az-name">' + title.substring(0,10).toUpperCase() + '</span>';
+        }
+        inner += '<span>' + title.substring(0,15) + '</span>';
+        el.innerHTML = inner;
+        strip.appendChild(el);
+      });
+    })
+    .catch(function() {});
+}
+
 window.addEventListener('load', function() {
-  document.querySelectorAll('.az-strip img').forEach(function(img) {
-    var src = img.getAttribute('src');
-    if (src) img.setAttribute('src', proxyImg(src));
-  });
+  loadAziende();
 });
 </script>
 </body>
