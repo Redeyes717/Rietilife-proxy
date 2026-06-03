@@ -27,41 +27,33 @@ function fetchUrl(target, res, contentType) {
   req.on('timeout', function() { req.destroy(); res.writeHead(504); res.end(JSON.stringify({error:'timeout'})); });
 }
 
-function scrapeVideos(url, res) {
-  https.get(url, { headers: {'User-Agent':'Mozilla/5.0'}, timeout: 20000 }, function(r) {
+function scrapeVideos(res) {
+  var url = 'https://www.rietilife.com/?video-category=cronaca';
+  https.get(url, { headers: {'User-Agent':'Mozilla/5.0'}, timeout: 25000 }, function(r) {
     var data = '';
     r.on('data', function(c) { data += c; });
     r.on('end', function() {
       var videos = [];
-      // Pattern: <a href="permalink"><img src="thumb"></a> + <h3><a href="permalink">Title</a></h3> + date
-      var re = /<a href="(https:\/\/www\.rietilife\.com\/video\/[^"]+)">\s*<img[^>]+src="([^"]+)"[^>]*>\s*<\/a>\s*(?:<\/dt>\s*<\/dl>)?\s*(?:<dl[^>]*>)?\s*<\/div>\s*(?:<\/div>)?\s*[\s\S]*?<h3[^>]*>\s*<a href="[^"]+">([^<]+)<\/a>\s*<\/h3>\s*\n?\s*([\d\/]+ [\d:]+)/g;
-      var match;
-      while ((match = re.exec(data)) !== null && videos.length < 50) {
-        videos.push({
-          link: match[1],
-          thumb: match[2].replace('-300x200.', '-655x437.'),
-          title: match[3].trim(),
-          date: match[4] ? match[4].trim() : ''
-        });
-      }
-      // Fallback: cerca pattern più semplice thumbnail + h3
-      if (videos.length === 0) {
-        var imgRe = /<a href="(https:\/\/www\.rietilife\.com\/video\/[^"]+)"><img[^>]+src="([^"]+)"[^>]*><\/a>/g;
-        var titleRe = /<h3[^>]*><a href="https:\/\/www\.rietilife\.com\/video\/([^"]+)">([^<]+)<\/a><\/h3>/g;
-        var imgs = {}, titles = {};
-        var m;
-        while ((m = imgRe.exec(data)) !== null) imgs[m[1]] = m[2];
-        while ((m = titleRe.exec(data)) !== null) titles['https://www.rietilife.com/video/' + m[1]] = m[2];
-        Object.keys(titles).forEach(function(link) {
-          if (videos.length < 50) {
-            videos.push({
-              link: link,
-              thumb: (imgs[link] || '').replace('-300x200.', '-655x437.'),
-              title: titles[link].trim(),
-              date: ''
-            });
-          }
-        });
+      var seen = {};
+      var linkRe = /href="(https:\/\/www\.rietilife\.com\/video\/[^"]+)"/g;
+      var imgRe = /href="(https:\/\/www\.rietilife\.com\/video\/[^"]+)"[^>]*>\s*<img[^>]+src="([^"]+)"/g;
+      var titleRe = /<h3[^>]*>\s*<a href="(https:\/\/www\.rietilife\.com\/video\/[^"]+)"[^>]*>([^<]+)<\/a>/g;
+      var imgs = {}, titles = {};
+      var m;
+      while ((m = imgRe.exec(data)) !== null) imgs[m[1]] = m[2];
+      while ((m = titleRe.exec(data)) !== null) titles[m[1]] = m[2].trim();
+      while ((m = linkRe.exec(data)) !== null) {
+        var link = m[1];
+        if (seen[link]) continue;
+        seen[link] = true;
+        if (titles[link]) {
+          videos.push({
+            link: link,
+            thumb: (imgs[link] || '').replace(/-300x200\./, '-655x437.'),
+            title: titles[link],
+            date: ''
+          });
+        }
       }
       res.setHeader('Content-Type', 'application/json');
       res.writeHead(200);
@@ -83,13 +75,8 @@ const server = http.createServer(function(req, res) {
   var video = params.get('video') || '';
   var vlist = params.get('vlist') || '';
 
-  // Lista video dalla pagina WebTV
-  if (vlist) {
-    scrapeVideos('https://www.rietilife.com/rieti-life-tv/', res);
-    return;
-  }
+  if (vlist) { scrapeVideos(res); return; }
 
-  // Estrai YouTube ID da una pagina video
   if (video) {
     https.get(decodeURIComponent(video), { headers:{'User-Agent':'Mozilla/5.0'}, timeout:20000 }, function(r) {
       var data = '';
