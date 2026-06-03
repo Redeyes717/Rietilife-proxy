@@ -310,7 +310,7 @@ function openArticle(post) {
     tmp.innerHTML = c;
     tmp.querySelectorAll('script,iframe,style,.addtoany_share_save_container,.sharedaddy,.jp-relatedposts,figure.wp-block-embed').forEach(function(el) { el.remove(); });
     tmp.querySelectorAll('p').forEach(function(p) { if (p.textContent.indexOf('proviene da') !== -1) p.remove(); });
-    tmp.querySelectorAll('img').forEach(function(img) { img.removeAttribute('width'); img.removeAttribute('height'); img.style.maxWidth='100%'; img.loading='lazy'; });
+    tmp.querySelectorAll('img').forEach(function(img) { img.removeAttribute('width'); img.removeAttribute('height'); img.style.maxWidth='100%'; img.loading='lazy'; var src = img.getAttribute('src'); if (src) img.setAttribute('src', proxyImg(src)); });
     var area = document.getElementById('rta');
     if (area) { area.className = 'reader-text'; area.innerHTML = tmp.innerHTML || '<p>Contenuto non disponibile.</p>'; }
   }).catch(function() {
