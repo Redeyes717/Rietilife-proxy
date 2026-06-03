@@ -402,24 +402,40 @@ document.getElementById('vclose').addEventListener('click', function() {
 
 function loadVideos() {
   var grid = document.getElementById('vgrid');
-  fetch(PROXY + '/?vlist=1')
-    .then(function(r) { return r.json(); })
-    .then(function(videos) {
-      if (!videos || !videos.length) {
+  apiFetch('/wp/v2/posts?per_page=30&_embed&orderby=date&order=desc&categories=41344,41345,41335')
+    .then(function(posts) {
+      // Filtra solo i post con URL /video/
+      var videos = posts.filter(function(p) { return p.link && p.link.indexOf('/video/') !== -1; });
+      if (!videos.length) {
+        // Fallback: cerca per slug
+        return apiFetch('/wp/v2/posts?per_page=50&_embed&orderby=date&order=desc&search=rietilife+tv');
+      }
+      return videos;
+    })
+    .then(function(posts) {
+      if (!posts || !posts.length) {
         grid.innerHTML = '<p style="color:#555;padding:20px;text-align:center">Nessun video.</p>';
         return;
       }
       var html = '<div class="vsec">Ultimi Video</div>';
-      videos.forEach(function(v) {
-        html += '<div class="vcard" onclick="openVideo(\'' + encodeURIComponent(v.link) + '\',\'' + encodeURIComponent(v.title) + '\')">';
+      posts.forEach(function(post) {
+        if (!post.link || post.link.indexOf('/video/') === -1) return;
+        var title = (post.title && post.title.rendered || '').replace(/<[^>]+>/g, '');
+        var link = post.link;
+        var thumb = getImg(post);
+        var cat = getCat(post);
+        var date = post.date || '';
+        html += '<div class="vcard" onclick="openVideo(\'' + encodeURIComponent(link) + '\',\'' + encodeURIComponent(title) + '\')">';
         html += '<div class="vthumb">';
-        if (v.thumb) html += '<img src="' + proxyImg(v.thumb) + '" alt="" loading="lazy">';
+        if (thumb) html += '<img src="' + proxyImg(thumb) + '" alt="" loading="lazy">';
         html += '<div class="vplay"></div></div>';
-        html += '<div class="vinfo"><div class="vtitle">' + v.title + '</div>';
-        if (v.date) html += '<div class="vdate">' + v.date + '</div>';
+        html += '<div class="vinfo">';
+        if (cat) html += '<div class="vcat">' + cat + '</div>';
+        html += '<div class="vtitle">' + title + '</div>';
+        html += '<div class="vdate">' + ago(date) + '</div>';
         html += '</div></div>';
       });
-      grid.innerHTML = html;
+      grid.innerHTML = html || '<p style="color:#555;padding:20px;text-align:center">Nessun video.</p>';
     })
     .catch(function() {
       grid.innerHTML = '<p style="color:#555;padding:20px;text-align:center">Video non disponibili.</p>';
