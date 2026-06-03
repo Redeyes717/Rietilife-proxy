@@ -40,6 +40,8 @@ function scrapeVideos(res) {
       links.forEach(function(link) {
         if (seen[link]) return;
         seen[link] = true;
+        // Solo i veri video con slug rietilife-tv-
+        if (link.indexOf('/video/rietilife-tv-') === -1 && link.indexOf('/video/rietlife-tv-') === -1) return;
         // Cerca il titolo vicino al link
         var idx = data.indexOf(link);
         var nearby = data.substring(idx, idx + 500);
